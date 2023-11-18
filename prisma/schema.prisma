@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Admission {
+  id                    String     @id @default(auto()) @map("_id") @db.ObjectId
+  admission_id          String     @unique
+  image                 String
+  name                  String
+  dob                   String
+  gender                Gender
+  religion              Religion
+  phone_number          String     @unique
+  email                 String?    @unique
+  blood_group           String
+  ssc_roll              String
+  ssc_reg               String
+  ssc_passing_year      String
+  ssc_gpa               String
+  ssc_department        DEPARTMENT
+  school                String
+  hsc_roll              String
+  hsc_reg               String
+  hsc_session           String
+  hsc_gpa               String?
+  hsc_department        DEPARTMENT
+  collage               String
+  father_name           String
+  mother_name           String
+  guardian_name         String
+  guardian_phone_number String
+  permanent_address     String
+  present_address       String
+  goal                  String
+  payment_number        String
+  transaction_id        String     @unique
+  apply_date            DateTime   @default(now())
+}
+
+enum Gender {
+  Male
+  Female
+}
+
+enum Religion {
+  Islam
+  Buddhism
+  Hinduism
+  Christianity
+}
+
+enum DEPARTMENT {
+  Science
+  Arts
+  Commerce
+}
+
+// members schema
+model Members {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  image             String
+  gender            Gender
+  blood_group       String
+  father_or_husband String
+  designation       String
+  permanent_address String
+  present_address   String
+  phone             String
+  email             String
+  degree            String
+  priority          String
+  create_at         DateTime @default(now())
+}
+
+// user model
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  username          String   @unique
+  name              String
+  email             String   @unique
+  phone             String   @unique
+  password          String
+  role              Role     @default(moderator)
+  otp               String   @default("")
+  otpExpirationTime DateTime
+  create_at         DateTime @default(now())
+  notices           Notice[]
+  blog              Blog[]
+}
+
+enum Role {
+  moderator
+  admin
+  superAdmin
+}
+
+// notice schema
+model Notice {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  file         String
+  type         String
+  publish_date DateTime @default(now())
+  publishBy    String   @db.ObjectId
+  user         User     @relation(fields: [publishBy], references: [id])
+}
+
+// blog schema
+model Blog {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  image      String
+  content    String
+  category   String
+  author     String   @db.ObjectId
+  like       Int      @default(0)
+  tags       Json[]   
+  publish_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  user       User     @relation(fields: [author], references: [id])
+
+  @@map("Blogs")
+}
